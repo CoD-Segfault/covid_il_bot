@@ -10,7 +10,7 @@ def format_date(date):
     return date.strftime("%Y-%m-%d")
 
 # Get today's date and format it how needed
-today = date.today() - timedelta(3)
+today = date.today()
 today_formatted = format_date(today)
 
 combined_data = get_idph_data()
