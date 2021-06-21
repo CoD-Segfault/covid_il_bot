@@ -20,7 +20,7 @@ def import_date(date, add_day=False):
 def get_idph_data():
 
     # Get today's date and format it how needed
-    today = date.today() - timedelta(3)
+    today = date.today()
     today_formatted = format_date(today)
     
     # data source for tests and deaths
