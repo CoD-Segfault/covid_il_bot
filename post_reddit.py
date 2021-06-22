@@ -4,6 +4,7 @@ from praw.util.token_manager import FileTokenManager
 from format_data import week_comparison, weekly_reference, weekly_average, past_days
 from datetime import datetime, date, timedelta
 from get_data import get_idph_data
+import os, sys
 
 # formats date to ISO 8601
 def format_date(date):
@@ -62,10 +63,10 @@ selftext += (f"{weekly_reference(combined_data, reference_date=today)}\n\n"
         "This post was automatically generated based on the latest data from the IDPH website.  \n"
         "Source code is available at https://github.com/CoD-Segfault/covid_il_bot")
 
-credentials_file = open("credentials.json")
+credentials_file = open(os.path.join(sys.path[0], "credentials.json"))
 credentials = json.load(credentials_file)
 
-refresh_token_filename = "refresh_token.txt"
+refresh_token_filename = os.path.join(sys.path[0], "refresh_token.txt")
 
 refresh_token_manager = FileTokenManager(refresh_token_filename)
 reddit = praw.Reddit(
