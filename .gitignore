@@ -1,0 +1,5 @@
+
+.vscode/
+credentials.json
+__pycache__/
+refresh_token.txt
