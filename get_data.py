@@ -104,6 +104,12 @@ def get_idph_data():
         combined_data[normalized_date]['total_population_percent_vaccinated'] = day_percent_vaccinated
     """
 
+    # Check to make sure that the data for today is available, otherwise try again in 30 seconds.
+    if today_formatted not in combined_data:
+        print("Data not abailable yet, pausing 30 seconds.")
+        time.sleep(30)
+        combined_data = get_idph_data()
+
     # Ingest CDC data
     for day in cdc_vaccine_data.json():
         day_date = day['date']
@@ -138,12 +144,6 @@ def get_idph_data():
         combined_data[normalized_date]['fully_vaccinated_percent_12plus'] = fully_vaccinated_12plus
         combined_data[normalized_date]['fully_vaccinated_percent_18plus'] = fully_vaccinated_18plus
         combined_data[normalized_date]['fully_vaccinated_percent_65plus'] = fully_vaccinated_65plus
-    
-    # Check to make sure that the data for today is available, otherwise try again in 30 seconds.
-    if today_formatted not in combined_data:
-        print("Data not abailable yet, pausing 30 seconds.")
-        time.sleep(30)
-        combined_data = get_idph_data()
 
     return combined_data
     
