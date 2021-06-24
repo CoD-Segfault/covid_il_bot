@@ -130,7 +130,7 @@ def get_idph_data():
         combined_data[normalized_date]['vaccines_administered_12plus'] = day_vaccines_administered_12plus
         combined_data[normalized_date]['vaccines_administered_18plus'] = day_vaccines_administered_18plus
         combined_data[normalized_date]['vaccines_administered_65plus'] = day_vaccines_administered_65plus
-        combined_data[normalized_date]['vaccines_first_dose_total'] = first_dose_percent_total
+        combined_data[normalized_date]['vaccines_first_dose_percent_total'] = first_dose_percent_total
         combined_data[normalized_date]['vaccines_first_dose_percent_12plus'] = first_dose_percent_12plus
         combined_data[normalized_date]['vaccines_first_dose_percent_18plus'] = first_dose_percent_18plus
         combined_data[normalized_date]['vaccines_first_dose_percent_65plus'] = first_dose_percent_65plus

@@ -84,3 +84,21 @@ def week_comparison(combined_data, reference_date = date.today()):
 
     return text
 
+def doses_administered(combined_data, metric, reference_date = date.today()):
+    yesterday = past_days(1, reference_date=reference_date)
+    today_formatted = format_date(reference_date)
+    yesterday_formatted = format_date(yesterday)
+
+    today_doses = combined_data[today_formatted][metric]
+    yesterday_doses = combined_data[yesterday_formatted][metric]
+
+    change = int(today_doses) - int(yesterday_doses)
+
+    return change
+
+def vaccine_average(combined_data, metric, reference_date = date.today()):
+    today_doses = combined_data[format_date(reference_date)][metric]
+    seven_days_ago_doses = combined_data[format_date(past_days(7, reference_date))][metric]
+    total = int(today_doses) - int(seven_days_ago_doses)
+    average = round(total / 7)
+    return average
