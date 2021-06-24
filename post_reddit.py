@@ -91,4 +91,5 @@ reddit = praw.Reddit(
     client_secret = credentials["praw_client_secret"]
 )
 
-reddit.subreddit("coronavirusillinois").submit(title, selftext=selftext)
+reddit.validate_on_submit = True
+post = reddit.subreddit("coronavirusillinois").submit(title, selftext=selftext, flair_id="4be3f066-cf71-11eb-95ff-0e28526b1d53")
