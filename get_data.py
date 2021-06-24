@@ -9,8 +9,11 @@ def format_date(date):
     return date.strftime("%Y-%m-%d")
 
 # takes date from IDPH source and strips time value
-def import_date(date, add_day=False):
-    imported_date = datetime.strptime(date,"%Y-%m-%dT%H:%M:%S")
+def import_date(date, add_day=False, cdc=False):
+    if cdc:
+        imported_date = datetime.strptime(date,"%Y-%m-%dT%H:%M:%S.%f")
+    else:
+        imported_date = datetime.strptime(date,"%Y-%m-%dT%H:%M:%S")
     if add_day:
         imported_date = imported_date + timedelta(1)
     formatted_date = format_date(imported_date)
@@ -30,12 +33,16 @@ def get_idph_data():
     hospital_url = "https://idph.illinois.gov/DPHPublicInformation/api/COVIDExport/GetHospitalUtilizationResults"
 
     # data source for vaccination info
-    vaccine_url = "https://idph.illinois.gov/DPHPublicInformation/api/COVIDExport/GetVaccineAdministration?countyname="
+    #vaccine_url = "https://idph.illinois.gov/DPHPublicInformation/api/COVIDExport/GetVaccineAdministration?countyname="
+
+    # CDC vaccination data source
+    cdc_vaccine_url = "https://data.cdc.gov/resource/unsk-b7fc.json?location=IL"
 
     # grab all the data sources
     test_data = requests.get(test_url)
     hospital_data = requests.get(hospital_url)
-    vaccine_data = requests.get(vaccine_url)
+    #vaccine_data = requests.get(vaccine_url)
+    cdc_vaccine_data = requests.get(cdc_vaccine_url)
 
     # create a dictionary to combine all data by date
     combined_data = dict()
@@ -75,8 +82,8 @@ def get_idph_data():
         combined_data[normalized_date]['covid_icu'] = day_covid_icu
         combined_data[normalized_date]['covid_beds'] = day_covid_beds
 
-    # get relevant info for vaccinations.
-    for day in vaccine_data.json():
+    # get relevant info for vaccinations. switching to CDC data
+    """ for day in vaccine_data.json():
         day_date = day['Report_Date']
         day_vaccines_administered = day['AdministeredCountChange']
         day_vaccines_rolling_avg = day['AdministeredCountRollAvg']
@@ -95,6 +102,42 @@ def get_idph_data():
         combined_data[normalized_date]['vaccine_doses'] = day_vaccines_administered
         combined_data[normalized_date]['vaccine_rolling_average'] = day_vaccines_rolling_avg
         combined_data[normalized_date]['total_population_percent_vaccinated'] = day_percent_vaccinated
+    """
+
+    # Ingest CDC data
+    for day in cdc_vaccine_data.json():
+        day_date = day['date']
+        day_vaccines_administered_total = day['administered']
+        day_vaccines_administered_12plus = day['administered_12plus']
+        day_vaccines_administered_18plus = day['administered_18plus']
+        day_vaccines_administered_65plus = day['administered_65plus']
+        first_dose_percent_total = day['administered_dose1_pop_pct']
+        first_dose_percent_12plus = day['administered_dose1_recip_2']
+        first_dose_percent_18plus = day['administered_dose1_recip_4']
+        first_dose_percent_65plus = day['administered_dose1_recip_6']
+        fully_vaccinated_total = day['series_complete_pop_pct']
+        fully_vaccinated_12plus = day['series_complete_12pluspop']
+        fully_vaccinated_18plus = day['series_complete_18pluspop']
+        fully_vaccinated_65plus = day['series_complete_65pluspop']
+
+        normalized_date = import_date(day_date, add_day=True, cdc=True)
+
+        # add day if it doesn't exist
+        if normalized_date not in combined_data:
+            combined_data[normalized_date] = dict()
+
+        combined_data[normalized_date]['vaccines_administered_total'] = day_vaccines_administered_total
+        combined_data[normalized_date]['vaccines_administered_12plus'] = day_vaccines_administered_12plus
+        combined_data[normalized_date]['vaccines_administered_18plus'] = day_vaccines_administered_18plus
+        combined_data[normalized_date]['vaccines_administered_65plus'] = day_vaccines_administered_65plus
+        combined_data[normalized_date]['vaccines_first_dose_total'] = first_dose_percent_total
+        combined_data[normalized_date]['vaccines_first_dose_percent_12plus'] = first_dose_percent_12plus
+        combined_data[normalized_date]['vaccines_first_dose_percent_18plus'] = first_dose_percent_18plus
+        combined_data[normalized_date]['vaccines_first_dose_percent_65plus'] = first_dose_percent_65plus
+        combined_data[normalized_date]['fully_vaccinated_percent_total'] = fully_vaccinated_total
+        combined_data[normalized_date]['fully_vaccinated_percent_12plus'] = fully_vaccinated_12plus
+        combined_data[normalized_date]['fully_vaccinated_percent_18plus'] = fully_vaccinated_18plus
+        combined_data[normalized_date]['fully_vaccinated_percent_65plus'] = fully_vaccinated_65plus
     
     # Check to make sure that the data for today is available, otherwise try again in 30 seconds.
     if today_formatted not in combined_data:
@@ -103,3 +146,4 @@ def get_idph_data():
         combined_data = get_idph_data()
 
     return combined_data
+    
