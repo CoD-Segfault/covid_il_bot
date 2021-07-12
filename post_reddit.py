@@ -64,10 +64,10 @@ selftext = (f"There were {new_cases:,} reported today.  With {tests:,} tests adm
         f"There are {hospitalizations:,} hospitalizations, with {icu_usage:,} in the ICU, and {ventilator_usage:,} ventilators in use.\n\n"
         f"**Please note that the vaccine data source has changed from the IDPH to the CDC.**  \n"
         f"{day_vaccines_administered_total:,} vaccine doses were administered yesterday, bringing the 7 day rolling average to {vaccine_average_total:,}.\n\n"
-        f"{fully_vaccinated_total}% of the total Illinois population are fully vaccinated, with {first_dose_percent_total}% having recieved their first dose.  \n"
-        f"{fully_vaccinated_65plus}% of population age 65+ are fully vaccinated, with {first_dose_percent_65plus}% having recieved their first dose.  \n"
-        f"{fully_vaccinated_18plus}% of population age 18+ are fully vaccinated, with {first_dose_percent_18plus}% having recieved their first dose.  \n"
-        f"{fully_vaccinated_12plus}% of population age 12+ are fully vaccinated, with {first_dose_percent_12plus}% having recieved their first dose.  \n\n"
+        f"{fully_vaccinated_total}% of the total Illinois population are fully vaccinated, with {first_dose_percent_total}% having received their first dose.  \n"
+        f"{fully_vaccinated_65plus}% of population age 65+ are fully vaccinated, with {first_dose_percent_65plus}% having received their first dose.  \n"
+        f"{fully_vaccinated_18plus}% of population age 18+ are fully vaccinated, with {first_dose_percent_18plus}% having received their first dose.  \n"
+        f"{fully_vaccinated_12plus}% of population age 12+ are fully vaccinated, with {first_dose_percent_12plus}% having received their first dose.  \n\n"
         )
 
 if today.isoweekday() == 1:
