@@ -40,6 +40,13 @@ def weekly_average(combined_data, metric, reference_date = date.today()):
 def compare_metric(today, last_week):
     return round((today / last_week - 1) * 100, 2)
 
+def vaccine_average(combined_data, metric, reference_date = date.today()):
+    today_doses = combined_data[format_date(reference_date)][metric]
+    seven_days_ago_doses = combined_data[format_date(past_days(7, reference_date))][metric]
+    total = int(today_doses) - int(seven_days_ago_doses)
+    average = round(total / 7)
+    return average
+
 def week_comparison(combined_data, reference_date = date.today()):
     last_week = past_days(7, reference_date)
     case_7_day_avg_today = weekly_average(combined_data, "cases", reference_date)
@@ -52,12 +59,15 @@ def week_comparison(combined_data, reference_date = date.today()):
     icu_7_day_avg_last_week = weekly_average(combined_data, "covid_icu", last_week)
     vent_7_day_avg_today = weekly_average(combined_data, "covid_vent", reference_date)
     vent_7_day_avg_last_week = weekly_average(combined_data, "covid_vent", last_week)
+    vaccine_7_day_avg_today = vaccine_average(combined_data, "administered", reference_date)
+    vaccine_7_day_avg_last_week = vaccine_average(combined_data, "administered", last_week)
 
     case_change = compare_metric(case_7_day_avg_today, case_7_day_avg_last_week)
     death_change = compare_metric(deaths_7_day_avg_today, deaths_7_day_avg_last_week)
     hospitalizations_change = compare_metric(hospitalizations_7_day_avg_today, hospitalizations_7_day_avg_last_week)
     icu_change = compare_metric(icu_7_day_avg_today, icu_7_day_avg_last_week)
     vent_change = compare_metric(vent_7_day_avg_today, vent_7_day_avg_last_week)
+    vaccine_change = compare_metric(vaccine_7_day_avg_today, vaccine_7_day_avg_last_week)
 
     text = "Week over week change in 7-day rolling average:  \n"
 
@@ -81,6 +91,10 @@ def week_comparison(combined_data, reference_date = date.today()):
         text += f"Ventilator usage up {vent_change}%  \n"
     else:
         text += f"Ventilator usage down {abs(vent_change)}%  \n"
+    if vaccine_change > 0:
+        text += f"Vaccinations up {vent_change}%  \n"
+    else:
+        text += f"Vaccinations down {abs(vent_change)}%  \n"
 
     return text
 
@@ -95,10 +109,3 @@ def doses_administered(combined_data, metric, reference_date = date.today()):
     change = int(today_doses) - int(yesterday_doses)
 
     return change
-
-def vaccine_average(combined_data, metric, reference_date = date.today()):
-    today_doses = combined_data[format_date(reference_date)][metric]
-    seven_days_ago_doses = combined_data[format_date(past_days(7, reference_date))][metric]
-    total = int(today_doses) - int(seven_days_ago_doses)
-    average = round(total / 7)
-    return average
