@@ -59,8 +59,8 @@ def week_comparison(combined_data, reference_date = date.today()):
     icu_7_day_avg_last_week = weekly_average(combined_data, "covid_icu", last_week)
     vent_7_day_avg_today = weekly_average(combined_data, "covid_vent", reference_date)
     vent_7_day_avg_last_week = weekly_average(combined_data, "covid_vent", last_week)
-    vaccine_7_day_avg_today = vaccine_average(combined_data, "administered", reference_date)
-    vaccine_7_day_avg_last_week = vaccine_average(combined_data, "administered", last_week)
+    vaccine_7_day_avg_today = vaccine_average(combined_data, "vaccines_administered_total", reference_date)
+    vaccine_7_day_avg_last_week = vaccine_average(combined_data, "vaccines_administered_total", last_week)
 
     case_change = compare_metric(case_7_day_avg_today, case_7_day_avg_last_week)
     death_change = compare_metric(deaths_7_day_avg_today, deaths_7_day_avg_last_week)
