@@ -12,10 +12,10 @@ def past_days(num_days, reference_date = date.today()):
 
 def weekly_reference(combined_data, reference_date = date.today()):
     today_formatted = format_date(reference_date)
-    seven_days_ago = format_date(past_days(7, reference_date = date.today()))
-    fourteen_days_ago = format_date(past_days(14, reference_date = date.today()))
-    twentyone_days_ago = format_date(past_days(21, reference_date = date.today()))
-    twentyeight_days_ago = format_date(past_days(28, reference_date = date.today()))
+    seven_days_ago = format_date(past_days(7, reference_date))
+    fourteen_days_ago = format_date(past_days(14, reference_date))
+    twentyone_days_ago = format_date(past_days(21, reference_date))
+    twentyeight_days_ago = format_date(past_days(28, reference_date))
 
     cases_today = combined_data[today_formatted]['cases']
     cases_seven_days_ago = combined_data[seven_days_ago]['cases']
