@@ -59,7 +59,7 @@ if today.isoweekday() == 1:
 # Generate the title and text based on current data.
 title = f"Unofficial Daily Update for {today_formatted}. {new_cases} New Cases."
 
-selftext = (f"There were {new_cases:,} reported today.  With {tests:,} tests administered, we have a positivity rate of {positivity}%.\n\n"
+selftext = (f"There were {new_cases:,} positive cases reported today.  With {tests:,} tests administered, we have a positivity rate of {positivity}%.\n\n"
         f"There were {deaths:,} reported deaths.\n\n"
         f"There are {hospitalizations:,} hospitalizations, with {icu_usage:,} in the ICU, and {ventilator_usage:,} ventilators in use.\n\n"
         f"**Please note that the vaccine data source has changed from the IDPH to the CDC.**  \n"
@@ -78,6 +78,21 @@ selftext += (f"{weekly_reference(combined_data, reference_date=today)}\n\n"
         "This post was automatically generated based on the latest data from the IDPH and CDC websites.  \n"
         "Source code is available at https://github.com/CoD-Segfault/covid_il_bot")
 
+if today.isoweekday() == 1:
+    saturday_positivity = round((combined_data[saturday_formatted]['cases'] / combined_data[saturday_formatted]['tested'] * 100), 2)
+    sunday_positivity = round((combined_data[sunday_formatted]['cases'] / combined_data[saturday_formatted]['tested'] * 100), 2)
+    comment = ("**Saturday**  \n"
+            f"There were {combined_data[saturday_formatted]['cases']:,} positive cases reported Saturday.  With {combined_data[saturday_formatted]['tested']:,} tests administered, we had a positivity rate of {saturday_positivity}%.\n\n"
+            f"There were {combined_data[saturday_formatted]['deaths']:,} reported deaths.\n\n"
+            f"There were {combined_data[saturday_formatted]['covid_beds']:,} hospitalizations, with {combined_data[saturday_formatted]['covid_icu']:,} in the ICU, and {combined_data[saturday_formatted]['covid_vent']:,} ventilators were in use.\n\n"
+            f"{weekly_reference(combined_data, reference_date=saturday)}\n\n")
+    comment += ("**Sunday**  \n"
+            f"There were {combined_data[sunday_formatted]['cases']:,} positive cases reported Sunday.  With {combined_data[sunday_formatted]['tested']:,} tests administered, we had a positivity rate of {sunday_positivity}%.\n\n"
+            f"There were {combined_data[sunday_formatted]['deaths']:,} reported deaths.\n\n"
+            f"There were {combined_data[sunday_formatted]['covid_beds']:,} hospitalizations, with {combined_data[sunday_formatted]['covid_icu']:,} in the ICU, and {combined_data[sunday_formatted]['covid_vent']:,} ventilators were in use.\n\n"
+            f"{weekly_reference(combined_data, reference_date=sunday)}\n\n")
+
+
 credentials_file = open(os.path.join(sys.path[0], "credentials.json"))
 credentials = json.load(credentials_file)
 
@@ -93,3 +108,5 @@ reddit = praw.Reddit(
 
 reddit.validate_on_submit = True
 post = reddit.subreddit("coronavirusillinois").submit(title, selftext=selftext, flair_id="4be3f066-cf71-11eb-95ff-0e28526b1d53")
+if today.isoweekday() == 1:
+    post.reply(comment)
