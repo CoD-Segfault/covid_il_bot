@@ -92,9 +92,9 @@ def week_comparison(combined_data, reference_date = date.today()):
     else:
         text += f"Ventilator usage down {abs(vent_change)}%  \n"
     if vaccine_change > 0:
-        text += f"Vaccinations up {vent_change}%  \n"
+        text += f"Vaccinations up {vaccine_change}%  \n"
     else:
-        text += f"Vaccinations down {abs(vent_change)}%  \n"
+        text += f"Vaccinations down {abs(vaccine_change)}%  \n"
 
     return text
 
