@@ -26,9 +26,9 @@ def weekly_reference(combined_data, reference_date = date.today()):
     ago_prior = "Ago" if (reference_date == date.today()) else "Prior"
     reference_day_of_week = "Today" if (reference_date == date.today()) else reference_date.strftime('%A')
 
-    return (f"Week over week reference:  \n" +
-    f"28 Days {ago_prior}: {cases_twentyeight_days_ago:,}  \n" +
-    f"21 Days {ago_prior}: {cases_twentyone_days_ago:,}  \n" +
+    return (f"Week over week reference:  \n"
+    f"28 Days {ago_prior}: {cases_twentyeight_days_ago:,}  \n"
+    f"21 Days {ago_prior}: {cases_twentyone_days_ago:,}  \n"
     f"14 Days {ago_prior}: {cases_fourteen_days_ago:,}  \n" 
     f"7 Days {ago_prior}: {cases_seven_days_ago:,}  \n"
     f"{reference_day_of_week}: {cases_today:,}  \n")
