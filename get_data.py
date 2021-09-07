@@ -104,11 +104,11 @@ def get_idph_data():
         combined_data[normalized_date]['total_population_percent_vaccinated'] = day_percent_vaccinated
     """
 
-    # Check to make sure that the data for today is available, otherwise try again in 30 seconds.
-    #if today_formatted not in combined_data:
-    #    print("Data not available yet, pausing 30 seconds.")
-    #    time.sleep(30)
-    #    combined_data = get_idph_data()
+    # Check to make sure that the data for today is available, otherwise try again in 5 minutes.
+    if today_formatted not in combined_data:
+        print("Data not available yet, pausing 30 seconds.")
+        time.sleep(300)
+        combined_data = get_idph_data()
 
     # Ingest CDC data
     for day in cdc_vaccine_data.json():
@@ -149,17 +149,17 @@ def get_idph_data():
     # Check to make sure each data source had data.  Saw conditions where we retrieve data as it's being updated and crash.
     if "cases" not in combined_data[today_formatted]:
         print("IDPH case/test data not available yet, pausing 30 seconds.")
-        time.sleep(30)
+        time.sleep(300)
         combined_data = get_idph_data()
         
     if "covid_vent" not in combined_data[today_formatted]:
         print("IDPH hospitalization data not available yet, pausing 30 seconds.")
-        time.sleep(30)
+        time.sleep(300)
         combined_data = get_idph_data()
         
     if "vaccines_administered_total" not in combined_data[today_formatted]:
         print("CDC vaccine data not available yet, pausing 30 seconds.")
-        time.sleep(30)
+        time.sleep(300)
         combined_data = get_idph_data()
 
     return combined_data
