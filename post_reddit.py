@@ -80,7 +80,7 @@ selftext += (f"{weekly_reference(combined_data, reference_date=today)}\n\n"
 
 if today.isoweekday() == 1:
     saturday_positivity = round((combined_data[saturday_formatted]['cases'] / combined_data[saturday_formatted]['tested'] * 100), 2)
-    sunday_positivity = round((combined_data[sunday_formatted]['cases'] / combined_data[saturday_formatted]['tested'] * 100), 2)
+    sunday_positivity = round((combined_data[sunday_formatted]['cases'] / combined_data[sunday_formatted]['tested'] * 100), 2)
     comment = ("**Saturday**  \n"
             f"There were {combined_data[saturday_formatted]['cases']:,} positive cases reported Saturday.  With {combined_data[saturday_formatted]['tested']:,} tests administered, we had a positivity rate of {saturday_positivity}%.\n\n"
             f"There were {combined_data[saturday_formatted]['deaths']:,} reported deaths.\n\n"
