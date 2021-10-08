@@ -32,9 +32,6 @@ def get_idph_data():
     # data source for hospital, ICU, and ventilator utilization
     hospital_url = "https://idph.illinois.gov/DPHPublicInformation/api/COVIDExport/GetHospitalUtilizationResults"
 
-    # data source for vaccination info
-    #vaccine_url = "https://idph.illinois.gov/DPHPublicInformation/api/COVIDExport/GetVaccineAdministration?countyname="
-
     # CDC vaccination data source
     cdc_vaccine_url = "https://data.cdc.gov/resource/unsk-b7fc.json?location=IL"
 
@@ -81,28 +78,6 @@ def get_idph_data():
         combined_data[normalized_date]['covid_vent'] = day_covid_vent
         combined_data[normalized_date]['covid_icu'] = day_covid_icu
         combined_data[normalized_date]['covid_beds'] = day_covid_beds
-
-    # get relevant info for vaccinations. switching to CDC data
-    """ for day in vaccine_data.json():
-        day_date = day['Report_Date']
-        day_vaccines_administered = day['AdministeredCountChange']
-        day_vaccines_rolling_avg = day['AdministeredCountRollAvg']
-        day_percent_vaccinated = day['PctVaccinatedPopulation']
-
-        # percent vaccinated is provided as a ratio, converting to actual percent to 2 decimal places
-        day_percent_vaccinated = round(day_percent_vaccinated * 100, 2)
-
-        # data delayed by one day, adjusting to match official reports
-        normalized_date = import_date(day_date, add_day=True)
-
-        # add day if it doesn't exist
-        if normalized_date not in combined_data:
-            combined_data[normalized_date] = dict()
-
-        combined_data[normalized_date]['vaccine_doses'] = day_vaccines_administered
-        combined_data[normalized_date]['vaccine_rolling_average'] = day_vaccines_rolling_avg
-        combined_data[normalized_date]['total_population_percent_vaccinated'] = day_percent_vaccinated
-    """
 
     # Check to make sure that the data for today is available, otherwise try again in 5 minutes.
     if today_formatted not in combined_data:
