@@ -54,6 +54,8 @@ def week_comparison(combined_data, reference_date = date.today()):
     last_week = past_days(7, reference_date)
     case_7_day_avg_today = weekly_average(combined_data, "cases", reference_date)
     case_7_day_avg_last_week = weekly_average(combined_data, "cases", last_week)
+    tested_7_day_avg_today = weekly_average(combined_data, "tested", reference_date)
+    tested_7_day_avg_last_week = weekly_average(combined_data, "tested", last_week)
     deaths_7_day_avg_today = weekly_average(combined_data, "deaths", reference_date)
     deaths_7_day_avg_last_week = weekly_average(combined_data, "deaths", last_week)
     hospitalizations_7_day_avg_today = weekly_average(combined_data, "covid_beds", reference_date)
@@ -66,6 +68,7 @@ def week_comparison(combined_data, reference_date = date.today()):
     vaccine_7_day_avg_last_week = vaccine_average(combined_data, "vaccines_administered_total", last_week)
 
     case_change = compare_metric(case_7_day_avg_today, case_7_day_avg_last_week)
+    tested_change = compare_metric(tested_7_day_avg_today, tested_7_day_avg_last_week)
     death_change = compare_metric(deaths_7_day_avg_today, deaths_7_day_avg_last_week)
     hospitalizations_change = compare_metric(hospitalizations_7_day_avg_today, hospitalizations_7_day_avg_last_week)
     icu_change = compare_metric(icu_7_day_avg_today, icu_7_day_avg_last_week)
@@ -78,6 +81,10 @@ def week_comparison(combined_data, reference_date = date.today()):
         text += f"New cases up {case_change}%  \n"
     else:
         text += f"New cases down {abs(case_change)}%  \n"
+    if tested_change > 0:
+        text += f"Testing up {tested_change}%  \n"
+    else:
+        text += f"Testing down {abs(tested_change)}%  \n"
     if death_change > 0:
         text += f"Deaths up {death_change}%  \n"
     else:
