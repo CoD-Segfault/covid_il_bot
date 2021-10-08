@@ -39,11 +39,11 @@ def weekly_reference(combined_data, reference_date = date.today()):
     reference_day_of_week = "Today" if (reference_date == date.today()) else reference_date.strftime('%A')
 
     return (f"Week over week reference:  \n"
-    f"28 Days {ago_prior}: {cases_twentyeight_days_ago:,} Cases, {tests_twentyeight_days_ago:,} Tests, {positivity_twentyeight_days_ago:,} Positivity  \n"
-    f"21 Days {ago_prior}: {cases_twentyone_days_ago:,} Cases, {tests_twentyone_days_ago:,} Tests, {positivity_twentyone_days_ago:,} Positivity  \n"
-    f"14 Days {ago_prior}: {cases_fourteen_days_ago:,} Cases, {tests_fourteen_days_ago:,} Tests, {positivity_fourteen_days_ago:,} Positivity  \n" 
-    f"7 Days {ago_prior}: {cases_seven_days_ago:,} Cases, {tests_seven_days_ago:,} Tests, {positivity_seven_days_ago:,} Positivity  \n"
-    f"{reference_day_of_week}: {cases_today:,} Cases, {tests_today:,} Tests, {positivity_today:,} Positivity  \n")
+    f"28 Days {ago_prior}: {cases_twentyeight_days_ago:,} Cases, {tests_twentyeight_days_ago:,} Tests, {positivity_twentyeight_days_ago}% Positivity  \n"
+    f"21 Days {ago_prior}: {cases_twentyone_days_ago:,} Cases, {tests_twentyone_days_ago:,} Tests, {positivity_twentyone_days_ago}% Positivity  \n"
+    f"14 Days {ago_prior}: {cases_fourteen_days_ago:,} Cases, {tests_fourteen_days_ago:,} Tests, {positivity_fourteen_days_ago}% Positivity  \n" 
+    f"7 Days {ago_prior}: {cases_seven_days_ago:,} Cases, {tests_seven_days_ago:,} Tests, {positivity_seven_days_ago}% Positivity  \n"
+    f"{reference_day_of_week}: {cases_today:,} Cases, {tests_today:,} Tests, {positivity_today}% Positivity  \n")
 
 def weekly_average(combined_data, metric, reference_date = date.today()):
     total = 0
