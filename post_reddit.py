@@ -39,6 +39,9 @@ fully_vaccinated_total = todays_data['fully_vaccinated_percent_total']
 fully_vaccinated_12plus = todays_data['fully_vaccinated_percent_12plus']
 fully_vaccinated_18plus = todays_data['fully_vaccinated_percent_18plus']
 fully_vaccinated_65plus = todays_data['fully_vaccinated_percent_65plus']
+booster_percent_total = todays_data['booster_percent_total']
+booster_percent_18plus = todays_data['booster_percent_18plus']
+booster_percent_65plus = todays_data['booster_percent_65plus']
 vaccine_average_total = vaccine_average(combined_data, 'vaccines_administered_total')
 
 # Check if it's Monday and add weekend stats 
@@ -64,9 +67,9 @@ selftext = (f"There were {new_cases:,} positive cases reported today.  With {tes
         f"There are {hospitalizations:,} hospitalizations, with {icu_usage:,} in the ICU, and {ventilator_usage:,} ventilators in use.\n\n"
         f"**Please note that the vaccine data source has changed from the IDPH to the CDC.**  \n"
         f"{day_vaccines_administered_total:,} vaccine doses were administered yesterday, bringing the 7 day rolling average to {vaccine_average_total:,}.\n\n"
-        f"{fully_vaccinated_total}% of the total Illinois population are fully vaccinated, with {first_dose_percent_total}% having received their first dose.  \n"
-        f"{fully_vaccinated_65plus}% of population age 65+ are fully vaccinated, with {first_dose_percent_65plus}% having received their first dose.  \n"
-        f"{fully_vaccinated_18plus}% of population age 18+ are fully vaccinated, with {first_dose_percent_18plus}% having received their first dose.  \n"
+        f"{fully_vaccinated_total}% of the total Illinois population are fully vaccinated, with {first_dose_percent_total}% having received their first dose.  {booster_percent_total}% have recieved a booster.  \n"
+        f"{fully_vaccinated_65plus}% of population age 65+ are fully vaccinated, with {first_dose_percent_65plus}% having received their first dose.  {booster_percent_65plus}% have recieved a booster.  \n"
+        f"{fully_vaccinated_18plus}% of population age 18+ are fully vaccinated, with {first_dose_percent_18plus}% having received their first dose.  {booster_percent_18plus}% have recieved a booster.  \n"
         f"{fully_vaccinated_12plus}% of population age 12+ are fully vaccinated, with {first_dose_percent_12plus}% having received their first dose.  \n\n"
         )
 
