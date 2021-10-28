@@ -88,10 +88,10 @@ def get_idph_data():
     # Ingest CDC data
     for day in cdc_vaccine_data.json():
         day_date = day['date']
-        day_vaccines_administered_total = day['administered'] + day['additional_doses']
+        day_vaccines_administered_total = int(day['administered']) + int(day['additional_doses'])
         day_vaccines_administered_12plus = day['administered_12plus']
-        day_vaccines_administered_18plus = day['administered_18plus'] + day['additional_doses_18plus']
-        day_vaccines_administered_65plus = day['administered_65plus'] + day['additional_doses_65plus']
+        day_vaccines_administered_18plus = int(day['administered_18plus']) + int(day['additional_doses_18plus'])
+        day_vaccines_administered_65plus = int(day['administered_65plus']) + int(day['additional_doses_65plus'])
         first_dose_percent_total = day['administered_dose1_pop_pct']
         first_dose_percent_12plus = day['administered_dose1_recip_2']
         first_dose_percent_18plus = day['administered_dose1_recip_4']
