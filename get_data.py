@@ -88,10 +88,10 @@ def get_idph_data():
     # Ingest CDC data
     for day in cdc_vaccine_data.json():
         day_date = day['date']
-        day_vaccines_administered_total = day['administered']
+        day_vaccines_administered_total = day['administered'] + day['additional_doses']
         day_vaccines_administered_12plus = day['administered_12plus']
-        day_vaccines_administered_18plus = day['administered_18plus']
-        day_vaccines_administered_65plus = day['administered_65plus']
+        day_vaccines_administered_18plus = day['administered_18plus'] + day['additional_doses_18plus']
+        day_vaccines_administered_65plus = day['administered_65plus'] + day['additional_doses_65plus']
         first_dose_percent_total = day['administered_dose1_pop_pct']
         first_dose_percent_12plus = day['administered_dose1_recip_2']
         first_dose_percent_18plus = day['administered_dose1_recip_4']
@@ -100,6 +100,9 @@ def get_idph_data():
         fully_vaccinated_12plus = day['series_complete_12pluspop']
         fully_vaccinated_18plus = day['series_complete_18pluspop']
         fully_vaccinated_65plus = day['series_complete_65pluspop']
+        booster_percent_total =  = day['additional_doses_vax_pct']
+        booster_percent_18plus = day['additional_doses_18plus_vax_pct']
+        booster_percent_65plus = day['additional_doses_65plus_vax_pct']
 
         normalized_date = import_date(day_date, add_day=True, cdc=True)
 
@@ -119,7 +122,9 @@ def get_idph_data():
         combined_data[normalized_date]['fully_vaccinated_percent_12plus'] = fully_vaccinated_12plus
         combined_data[normalized_date]['fully_vaccinated_percent_18plus'] = fully_vaccinated_18plus
         combined_data[normalized_date]['fully_vaccinated_percent_65plus'] = fully_vaccinated_65plus
-        
+        combined_data[normalized_date]['booster_percent_total'] = booster_percent_total
+        combined_data[normalized_date]['booster_percent_18plus'] = booster_percent_18plus
+        combined_data[normalized_date]['booster_percent_65plus'] = booster_percent_65plus        
         
     # Check to make sure each data source had data.  Saw conditions where we retrieve data as it's being updated and crash.
     if "cases" not in combined_data[today_formatted]:
