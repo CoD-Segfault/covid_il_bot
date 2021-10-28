@@ -88,10 +88,16 @@ def get_idph_data():
     # Ingest CDC data
     for day in cdc_vaccine_data.json():
         day_date = day['date']
-        day_vaccines_administered_total = int(day['administered']) + int(day['additional_doses'])
+        day_vaccines_administered_total = int(day['administered'])
+        if 'additional_doses' in day.keys():
+            day_vaccines_administered_total += int(day['additional_doses'])
         day_vaccines_administered_12plus = day['administered_12plus']
-        day_vaccines_administered_18plus = int(day['administered_18plus']) + int(day['additional_doses_18plus'])
-        day_vaccines_administered_65plus = int(day['administered_65plus']) + int(day['additional_doses_65plus'])
+        day_vaccines_administered_18plus = int(day['administered_18plus'])
+        if 'additional_doses_18plus' in day.keys():
+            day_vaccines_administered_18plus += int(day['additional_doses_18plus'])
+        day_vaccines_administered_65plus = int(day['administered_65plus'])
+        if 'additional_doses_65plus' in day.keys():
+            day_vaccines_administered_65plus += int(day['additional_doses_65plus'])
         first_dose_percent_total = day['administered_dose1_pop_pct']
         first_dose_percent_12plus = day['administered_dose1_recip_2']
         first_dose_percent_18plus = day['administered_dose1_recip_4']
@@ -100,9 +106,21 @@ def get_idph_data():
         fully_vaccinated_12plus = day['series_complete_12pluspop']
         fully_vaccinated_18plus = day['series_complete_18pluspop']
         fully_vaccinated_65plus = day['series_complete_65pluspop']
-        booster_percent_total  = day['additional_doses_vax_pct']
-        booster_percent_18plus = day['additional_doses_18plus_vax_pct']
-        booster_percent_65plus = day['additional_doses_65plus_vax_pct']
+        
+        # Kludge for bad CDC data returns, random days missing values.
+        if 'additional_doses_vax_pct' in day.keys():
+            booster_percent_total = day['additional_doses_vax_pct']
+        else:
+            booster_percent_total = 0
+        if 'additional_doses_18plus_vax_pct' in day.keys():
+            booster_percent_18plus = day['additional_doses_18plus_vax_pct']
+        else:
+            booster_percent_18plus = 0
+        if 'additional_doses_18plus_vax_pct' in day.keys():
+            booster_percent_65plus = day['additional_doses_65plus_vax_pct']
+        else:
+            booster_percent_65plus = 0
+        
 
         normalized_date = import_date(day_date, add_day=True, cdc=True)
 
