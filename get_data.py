@@ -100,7 +100,7 @@ def get_idph_data():
         fully_vaccinated_12plus = day['series_complete_12pluspop']
         fully_vaccinated_18plus = day['series_complete_18pluspop']
         fully_vaccinated_65plus = day['series_complete_65pluspop']
-        booster_percent_total =  = day['additional_doses_vax_pct']
+        booster_percent_total  = day['additional_doses_vax_pct']
         booster_percent_18plus = day['additional_doses_18plus_vax_pct']
         booster_percent_65plus = day['additional_doses_65plus_vax_pct']
 
