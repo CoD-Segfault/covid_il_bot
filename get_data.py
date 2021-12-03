@@ -100,9 +100,11 @@ def get_idph_data():
         #    day_vaccines_administered_65plus += int(day['additional_doses_65plus'])
         first_dose_percent_total = day['administered_dose1_pop_pct']
         first_dose_percent_12plus = day['administered_dose1_recip_2']
+        first_dose_percent_5plus = day['administered_dose1_recip_5pluspop_pct']
         first_dose_percent_18plus = day['administered_dose1_recip_4']
         first_dose_percent_65plus = day['administered_dose1_recip_6']
         fully_vaccinated_total = day['series_complete_pop_pct']
+        fully_vaccinated_5plus = day['series_complete_5pluspop_pct']
         fully_vaccinated_12plus = day['series_complete_12pluspop']
         fully_vaccinated_18plus = day['series_complete_18pluspop']
         fully_vaccinated_65plus = day['series_complete_65pluspop']
@@ -133,10 +135,12 @@ def get_idph_data():
         combined_data[normalized_date]['vaccines_administered_18plus'] = day_vaccines_administered_18plus
         combined_data[normalized_date]['vaccines_administered_65plus'] = day_vaccines_administered_65plus
         combined_data[normalized_date]['vaccines_first_dose_percent_total'] = first_dose_percent_total
+        combined_data[normalized_date]['vaccines_first_dose_percent_5plus'] = first_dose_percent_5plus
         combined_data[normalized_date]['vaccines_first_dose_percent_12plus'] = first_dose_percent_12plus
         combined_data[normalized_date]['vaccines_first_dose_percent_18plus'] = first_dose_percent_18plus
         combined_data[normalized_date]['vaccines_first_dose_percent_65plus'] = first_dose_percent_65plus
         combined_data[normalized_date]['fully_vaccinated_percent_total'] = fully_vaccinated_total
+        combined_data[normalized_date]['fully_vaccinated_percent_5plus'] = fully_vaccinated_5plus
         combined_data[normalized_date]['fully_vaccinated_percent_12plus'] = fully_vaccinated_12plus
         combined_data[normalized_date]['fully_vaccinated_percent_18plus'] = fully_vaccinated_18plus
         combined_data[normalized_date]['fully_vaccinated_percent_65plus'] = fully_vaccinated_65plus
