@@ -20,10 +20,10 @@ def import_date(date, add_day=False, cdc=False):
     return formatted_date
 
 # Pulls all data from IDPH and combines them to a single dictionary using the date as the key
-def get_idph_data():
+def get_idph_data(today=date.today()):
 
     # Get today's date and format it how needed
-    today = date.today()
+    #today = date.today()
     today_formatted = format_date(today)
     
     # data source for tests and deaths
@@ -100,11 +100,19 @@ def get_idph_data():
         #    day_vaccines_administered_65plus += int(day['additional_doses_65plus'])
         first_dose_percent_total = day['administered_dose1_pop_pct']
         first_dose_percent_12plus = day['administered_dose1_recip_2']
-        first_dose_percent_5plus = day['administered_dose1_recip_5pluspop_pct']
+        if 'series_complete_5pluspop_pct' in day.keys():
+            fully_vaccinated_5plus = day['series_complete_5pluspop_pct']
+        else:
+            fully_vaccinated_5plus = 0
+            
         first_dose_percent_18plus = day['administered_dose1_recip_4']
         first_dose_percent_65plus = day['administered_dose1_recip_6']
         fully_vaccinated_total = day['series_complete_pop_pct']
-        fully_vaccinated_5plus = day['series_complete_5pluspop_pct']
+        if 'series_complete_5pluspop_pct' in day.keys():
+            fully_vaccinated_5plus = day['series_complete_5pluspop_pct']
+        else:
+            fully_vaccinated_5plus = 0
+            
         fully_vaccinated_12plus = day['series_complete_12pluspop']
         fully_vaccinated_18plus = day['series_complete_18pluspop']
         fully_vaccinated_65plus = day['series_complete_65pluspop']
