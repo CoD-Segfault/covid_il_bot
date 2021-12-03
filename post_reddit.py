@@ -71,6 +71,7 @@ selftext = (f"There were {new_cases:,} positive cases reported today.  With {tes
         f"{fully_vaccinated_65plus}% of population age 65+ are fully vaccinated, with {first_dose_percent_65plus}% having received their first dose.  {booster_percent_65plus}% have recieved a booster.  \n"
         f"{fully_vaccinated_18plus}% of population age 18+ are fully vaccinated, with {first_dose_percent_18plus}% having received their first dose.  {booster_percent_18plus}% have recieved a booster.  \n"
         f"{fully_vaccinated_12plus}% of population age 12+ are fully vaccinated, with {first_dose_percent_12plus}% having received their first dose.  \n\n"
+        f"{fully_vaccinated_5plus}% of population age 5+ are fully vaccinated, with {first_dose_percent_5plus}% having received their first dose.  \n\n"
         )
 
 if today.isoweekday() == 1:
