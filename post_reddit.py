@@ -1,10 +1,8 @@
-import json
-import praw
-from praw.util.token_manager import FileTokenManager
 from format_data import *
-from datetime import datetime, date, timedelta
+from datetime import date
 from get_data import get_idph_data
-import os, sys
+import time
+
 
 # formats date to ISO 8601
 def format_date(date):
@@ -14,90 +12,129 @@ def format_date(date):
 today = date.today()
 today_formatted = format_date(today)
 
-combined_data = get_idph_data()
+combined_data = get_idph_data(today)
+
+while today_formatted not in combined_data:
+    print("Data not available yet, pausing 300 seconds.")
+    time.sleep(300)
+
+    today = date.today()
+    today_formatted = format_date(today)
+
 
 # Get the info from today.
 todays_data = combined_data[today_formatted]
-new_cases = todays_data['cases']
-deaths = todays_data['deaths']
-tests = todays_data['tested']
-positivity = round((new_cases / tests * 100), 2)
 
-hospitalizations = todays_data['covid_beds']
-icu_usage = todays_data['covid_icu']
-ventilator_usage = todays_data['covid_vent']
+infection_data_available = 'cases' in todays_data
+hospitalization_data_available = 'covid_icu' in todays_data
+vaccine_data_available = 'vaccines_administered_total' in todays_data
+tests_data_available = 'tested' in todays_data
 
-day_vaccines_administered_total = doses_administered(combined_data, 'vaccines_administered_total')
-day_vaccines_administered_12plus = doses_administered(combined_data, 'vaccines_administered_12plus')
-day_vaccines_administered_18plus = doses_administered(combined_data, 'vaccines_administered_18plus')
-day_vaccines_administered_65plus = doses_administered(combined_data, 'vaccines_administered_65plus')
-first_dose_percent_total = todays_data['vaccines_first_dose_percent_total']
-first_dose_percent_5plus = todays_data['vaccines_first_dose_percent_5plus']
-first_dose_percent_12plus = todays_data['vaccines_first_dose_percent_12plus']
-first_dose_percent_18plus = todays_data['vaccines_first_dose_percent_18plus']
-first_dose_percent_65plus = todays_data['vaccines_first_dose_percent_65plus']
-fully_vaccinated_total = todays_data['fully_vaccinated_percent_total']
-fully_vaccinated_5plus = todays_data['fully_vaccinated_percent_5plus']
-fully_vaccinated_12plus = todays_data['fully_vaccinated_percent_12plus']
-fully_vaccinated_18plus = todays_data['fully_vaccinated_percent_18plus']
-fully_vaccinated_65plus = todays_data['fully_vaccinated_percent_65plus']
-booster_percent_total = todays_data['booster_percent_total']
-booster_percent_18plus = todays_data['booster_percent_18plus']
-booster_percent_65plus = todays_data['booster_percent_65plus']
-vaccine_average_total = vaccine_average(combined_data, 'vaccines_administered_total')
+combined_data_keys_sorted = sorted(combined_data.keys(), reverse=True)
 
-# Check if it's Monday and add weekend stats 
-if today.isoweekday() == 1:
-    sunday = today - timedelta(1)
-    sunday_formatted = format_date(sunday)
-    sunday_data = combined_data[sunday_formatted]
+previous_infection_date = None
+previous_infection_data = None
+if infection_data_available:
+    for date_key in combined_data_keys_sorted:
+        if date_key != today_formatted and 'cases' in combined_data[date_key]:
+            previous_infection_date = date_key
+            previous_infection_data = combined_data[date_key]
+            break
 
-    saturday = today - timedelta(2)
-    saturday_formatted = format_date(saturday)
-    saturday_data = combined_data[saturday_formatted]
+previous_hospitalization_date = None
+previous_hospitalization_data = None
+if hospitalization_data_available:
+    for date_key in combined_data_keys_sorted:
+        if date_key != today_formatted and 'covid_icu' in combined_data[date_key]:
+            previous_hospitalization_date = date_key
+            previous_hospitalization_data = combined_data[date_key]
+            break
 
-    weekend_cases = sunday_data['cases'] + saturday_data['cases']
-    weekend_deaths = sunday_data['deaths'] + saturday_data['deaths']
-    weekend_doses = doses_administered(combined_data, 'vaccines_administered_total', reference_date=sunday) + doses_administered(combined_data, 'vaccines_administered_total', reference_date=saturday)
+previous_vaccine_date = None
+previous_vaccine_data = None
+if vaccine_data_available:
+    for date_key in combined_data_keys_sorted:
+        if date_key != today_formatted and 'vaccines_administered_total' in combined_data[date_key]:
+            previous_vaccine_date = date_key
+            previous_vaccine_data = combined_data[date_key]
+            break
+
+tests_date = None
+tests_data = None
+if tests_data_available:
+    for date_key in combined_data_keys_sorted:
+        if date_key != today_formatted and 'vaccines_administered_total' in combined_data[date_key]:
+            tests_date = date_key
+            tests_data = combined_data[date_key]
+            break
+
+# positivity = round((new_cases / tests * 100), 2)
+positivity = 0
+
+
+if vaccine_data_available:
+    day_vaccines_administered_total = doses_administered(combined_data, 'vaccines_administered_total', today, previous_vaccine_date)
+    day_vaccines_administered_12plus = doses_administered(combined_data, 'vaccines_administered_12plus', today, previous_vaccine_date)
+    day_vaccines_administered_18plus = doses_administered(combined_data, 'vaccines_administered_18plus', today, previous_vaccine_date)
+    day_vaccines_administered_65plus = doses_administered(combined_data, 'vaccines_administered_65plus', today, previous_vaccine_date)
+
+    first_dose_percent_total = todays_data['vaccines_first_dose_percent_total']
+    first_dose_percent_5plus = todays_data['vaccines_first_dose_percent_5plus']
+    first_dose_percent_12plus = todays_data['vaccines_first_dose_percent_12plus']
+    first_dose_percent_18plus = todays_data['vaccines_first_dose_percent_18plus']
+    first_dose_percent_65plus = todays_data['vaccines_first_dose_percent_65plus']
+    fully_vaccinated_total = todays_data['fully_vaccinated_percent_total']
+    fully_vaccinated_5plus = todays_data['fully_vaccinated_percent_5plus']
+    fully_vaccinated_12plus = todays_data['fully_vaccinated_percent_12plus']
+    fully_vaccinated_18plus = todays_data['fully_vaccinated_percent_18plus']
+    fully_vaccinated_65plus = todays_data['fully_vaccinated_percent_65plus']
+    booster_percent_total = todays_data['booster_percent_total']
+    booster_percent_18plus = todays_data['booster_percent_18plus']
+    booster_percent_65plus = todays_data['booster_percent_65plus']
+    # vaccine_average_total = vaccine_average(combined_data, 'vaccines_administered_total')
 
 
 # Generate the title and text based on current data.
-title = f"Unofficial Daily Update for {today_formatted}. {new_cases} New Cases."
+title = f"Unofficial Daily Update for {today_formatted}. "
+if infection_data_available:
+    title += f"{todays_data['cases']:,} New Cases."
 
-selftext = (f"There were {new_cases:,} positive cases reported today.  With {tests:,} tests administered, we have a positivity rate of {positivity}%.\n\n"
-        f"There were {deaths:,} reported deaths.\n\n"
-        f"There are {hospitalizations:,} hospitalizations, with {icu_usage:,} in the ICU, and {ventilator_usage:,} ventilators in use.\n\n"
-        f"**Please note that the vaccine data source has changed from the IDPH to the CDC.**  \n"
-        f"{day_vaccines_administered_total:,} vaccine doses were administered yesterday, bringing the 7 day rolling average to {vaccine_average_total:,}.\n\n"
-        f"{fully_vaccinated_total}% of the total Illinois population are fully vaccinated, with {first_dose_percent_total}% having received their first dose.  {booster_percent_total}% have recieved a booster.  \n"
-        f"{fully_vaccinated_65plus}% of population age 65+ are fully vaccinated, with {first_dose_percent_65plus}% having received their first dose.  {booster_percent_65plus}% have recieved a booster.  \n"
-        f"{fully_vaccinated_18plus}% of population age 18+ are fully vaccinated, with {first_dose_percent_18plus}% having received their first dose.  {booster_percent_18plus}% have recieved a booster.  \n"
-        f"{fully_vaccinated_12plus}% of population age 12+ are fully vaccinated, with {first_dose_percent_12plus}% having received their first dose.  \n"
-        f"{fully_vaccinated_5plus}% of population age 5+ are fully vaccinated, with {first_dose_percent_5plus}% having received their first dose.  \n\n"
-        )
+selftext = ""
 
-if today.isoweekday() == 1:
-    selftext += f"In addition to today's numbers, there have been {weekend_cases:,} new cases, {weekend_deaths:,} deaths, and {weekend_doses:,} vaccine doses administered since Friday's post.\n\n"
-        
-selftext += (f"{weekly_reference(combined_data, reference_date=today)}\n\n"
-        f"{week_comparison(combined_data, reference_date=today)}\n\n"
+if infection_data_available:
+    selftext += f"There were {todays_data['cases']:,} positive cases reported since {previous_infection_date}. \n\n"
+    selftext += f"There were {todays_data['deaths']:,} reported deaths since {previous_infection_date}.\n\n"
+
+if tests_data_available:
+    selftext += f"With {todays_data['tested']:,} tests administered, we have a positivity rate of {positivity}%.\n\n"
+
+
+if hospitalization_data_available:
+    selftext +=  f"Since {previous_hospitalization_date}, there are {todays_data['covid_beds']:,} hospitalizations, with {todays_data['covid_icu']:,} in the ICU, and {todays_data['covid_vent']:,} ventilators in use.\n\n"
+
+if vaccine_data_available:
+    selftext += f"**Please note that the vaccine data source has changed from the IDPH to the CDC.**  \n"
+    # selftext += f"{day_vaccines_administered_total:,} vaccine doses were administered since {previous_vaccine_date}, bringing the 7 day rolling average to {vaccine_average_total:,}.\n\n"
+    selftext += f"{day_vaccines_administered_total:,} vaccine doses were administered since {previous_vaccine_date}.\n\n"
+    selftext += f"{fully_vaccinated_total}% of the total Illinois population are fully vaccinated, with {first_dose_percent_total}% having received their first dose.  {booster_percent_total}% have recieved a booster. {todays_data['bivalent_booster_5plus']}% have recceived a bivalent booster. \n"
+    selftext += f"{fully_vaccinated_65plus}% of population age 65+ are fully vaccinated, with {first_dose_percent_65plus}% having received their first dose.  {booster_percent_65plus}% have recieved a booster.  \n"
+    selftext += f"{fully_vaccinated_18plus}% of population age 18+ are fully vaccinated, with {first_dose_percent_18plus}% having received their first dose.  {booster_percent_18plus}% have recieved a booster.  \n"
+    selftext += f"{fully_vaccinated_12plus}% of population age 12+ are fully vaccinated, with {first_dose_percent_12plus}% having received their first dose.  \n"
+    selftext += f"{fully_vaccinated_5plus}% of population age 5+ are fully vaccinated, with {first_dose_percent_5plus}% having received their first dose.  \n\n"
+
+
+if False:
+    selftext += (f"{weekly_reference(combined_data, reference_date=today)}\n\n"
+    f"{week_comparison(combined_data, reference_date=today)}\n\n")
+
+selftext += (
         "This post was automatically generated based on the latest data from the IDPH and CDC websites.  \n"
-        "Source code is available at https://github.com/CoD-Segfault/covid_il_bot")
+        "Source code is available at https://github.com/jsheputis/covid_il_bot")
 
-if today.isoweekday() == 1:
-    saturday_positivity = round((combined_data[saturday_formatted]['cases'] / combined_data[saturday_formatted]['tested'] * 100), 2)
-    sunday_positivity = round((combined_data[sunday_formatted]['cases'] / combined_data[sunday_formatted]['tested'] * 100), 2)
-    comment = ("**Saturday**  \n"
-            f"There were {combined_data[saturday_formatted]['cases']:,} positive cases reported Saturday.  With {combined_data[saturday_formatted]['tested']:,} tests administered, we had a positivity rate of {saturday_positivity}%.\n\n"
-            f"There were {combined_data[saturday_formatted]['deaths']:,} reported deaths.\n\n"
-            f"There were {combined_data[saturday_formatted]['covid_beds']:,} hospitalizations, with {combined_data[saturday_formatted]['covid_icu']:,} in the ICU, and {combined_data[saturday_formatted]['covid_vent']:,} ventilators were in use.\n\n"
-            f"{weekly_reference(combined_data, reference_date=saturday)}\n\n")
-    comment += ("**Sunday**  \n"
-            f"There were {combined_data[sunday_formatted]['cases']:,} positive cases reported Sunday.  With {combined_data[sunday_formatted]['tested']:,} tests administered, we had a positivity rate of {sunday_positivity}%.\n\n"
-            f"There were {combined_data[sunday_formatted]['deaths']:,} reported deaths.\n\n"
-            f"There were {combined_data[sunday_formatted]['covid_beds']:,} hospitalizations, with {combined_data[sunday_formatted]['covid_icu']:,} in the ICU, and {combined_data[sunday_formatted]['covid_vent']:,} ventilators were in use.\n\n"
-            f"{weekly_reference(combined_data, reference_date=sunday)}\n\n")
 
+# print(title)
+# print("---------------------------------------------------------------------------------------------------------------------------")
+# print(selftext)
 
 credentials_file = open(os.path.join(sys.path[0], "credentials.json"))
 credentials = json.load(credentials_file)
@@ -107,12 +144,11 @@ refresh_token_filename = os.path.join(sys.path[0], "refresh_token.txt")
 refresh_token_manager = FileTokenManager(refresh_token_filename)
 reddit = praw.Reddit(
     token_manager = refresh_token_manager,
-    user_agent = "linux:com.committeeofdoom.covidilbot:v0.1 (by /u/CoD_Segfault)",
+    user_agent = "linux:com.jsheputis.covidilbot:v0.2 (by /u/compg318)",
     client_id = credentials["praw_client_id"],
     client_secret = credentials["praw_client_secret"]
 )
 
 reddit.validate_on_submit = True
 post = reddit.subreddit("coronavirusillinois").submit(title, selftext=selftext, flair_id="4be3f066-cf71-11eb-95ff-0e28526b1d53")
-if today.isoweekday() == 1:
-    post.reply(comment)
+

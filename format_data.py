@@ -1,16 +1,13 @@
 from datetime import datetime, date, timedelta
 
-today = date.today()
-today_formatted = today.strftime("%Y-%m-%d")
-
 def format_date(date):
     return date.strftime("%Y-%m-%d")
 
-def past_days(num_days, reference_date = date.today()):
+def past_days(num_days, reference_date):
     old_date = reference_date - timedelta(num_days)
     return old_date
 
-def weekly_reference(combined_data, reference_date = date.today()):
+def weekly_reference(combined_data, reference_date):
     today_formatted = format_date(reference_date)
     seven_days_ago = format_date(past_days(7, reference_date))
     fourteen_days_ago = format_date(past_days(14, reference_date))
@@ -45,7 +42,7 @@ def weekly_reference(combined_data, reference_date = date.today()):
     f"7 Days {ago_prior}: {cases_seven_days_ago:,} Cases, {tests_seven_days_ago:,} Tests, {positivity_seven_days_ago}% Positivity  \n"
     f"{reference_day_of_week}: {cases_today:,} Cases, {tests_today:,} Tests, {positivity_today}% Positivity  \n")
 
-def weekly_average(combined_data, metric, reference_date = date.today()):
+def weekly_average(combined_data, metric, reference_date):
     total = 0
     for n in range(7):
         total += combined_data[format_date(past_days(n, reference_date))][metric]
@@ -55,14 +52,14 @@ def weekly_average(combined_data, metric, reference_date = date.today()):
 def compare_metric(today, last_week):
     return round((today / last_week - 1) * 100, 2)
 
-def vaccine_average(combined_data, metric, reference_date = date.today()):
+def vaccine_average(combined_data, metric, reference_date):
     today_doses = combined_data[format_date(reference_date)][metric]
     seven_days_ago_doses = combined_data[format_date(past_days(7, reference_date))][metric]
     total = int(today_doses) - int(seven_days_ago_doses)
     average = round(total / 7)
     return average
 
-def week_comparison(combined_data, reference_date = date.today()):
+def week_comparison(combined_data, reference_date):
     last_week = past_days(7, reference_date)
     case_7_day_avg_today = weekly_average(combined_data, "cases", reference_date)
     case_7_day_avg_last_week = weekly_average(combined_data, "cases", last_week)
@@ -120,14 +117,12 @@ def week_comparison(combined_data, reference_date = date.today()):
 
     return text
 
-def doses_administered(combined_data, metric, reference_date = date.today()):
-    yesterday = past_days(1, reference_date=reference_date)
+def doses_administered(combined_data, metric, reference_date, previous_reference_date):
     today_formatted = format_date(reference_date)
-    yesterday_formatted = format_date(yesterday)
 
     today_doses = combined_data[today_formatted][metric]
-    yesterday_doses = combined_data[yesterday_formatted][metric]
+    previous_doses = combined_data[previous_reference_date][metric]
 
-    change = int(today_doses) - int(yesterday_doses)
+    change = int(today_doses) - int(previous_doses)
 
     return change

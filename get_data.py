@@ -1,8 +1,6 @@
 import requests
 from datetime import datetime, date, timedelta
 
-import time
-
 
 # formats date to ISO 8601
 def format_date(date):
@@ -27,16 +25,18 @@ def get_idph_data(today=date.today()):
     today_formatted = format_date(today)
     
     # data source for tests and deaths
-    test_url = "https://idph.illinois.gov/DPHPublicInformation/api/COVIDExport/GetIllinoisCases"
+    # test_url = "https://idph.illinois.gov/DPHPublicInformation/api/COVIDExport/GetIllinoisCases"
+    case_url = "https://idph.illinois.gov/DPHPublicInformation/api/COVID19/CasesDeaths/getCaseDeathChange"
 
     # data source for hospital, ICU, and ventilator utilization
-    hospital_url = "https://idph.illinois.gov/DPHPublicInformation/api/COVIDExport/GetHospitalUtilizationResults"
+    hospital_url = "https://idph.illinois.gov/DPHPublicInformation/api/COVID/GetHospitalizationResults"
 
     # CDC vaccination data source
     cdc_vaccine_url = "https://data.cdc.gov/resource/unsk-b7fc.json?location=IL"
 
     # grab all the data sources
-    test_data = requests.get(test_url)
+    case_data = requests.get(case_url)
+    # print(test_data.json())
     hospital_data = requests.get(hospital_url)
     #vaccine_data = requests.get(vaccine_url)
     cdc_vaccine_data = requests.get(cdc_vaccine_url)
@@ -44,12 +44,12 @@ def get_idph_data(today=date.today()):
     # create a dictionary to combine all data by date
     combined_data = dict()
 
-    # get relevant info for tests and deaths
-    for day in test_data.json():
-        day_date = day['testDate']
-        day_cases = day['cases_change']
-        day_deaths = day['deaths_change']
-        day_tested = day['tested_change']
+    # get relevant info for cases and deaths
+    for day in case_data.json():
+        day_date = day['Report_Date']
+        day_cases = day['CaseChange']
+        day_deaths = day['DeathChange']
+        # day_tested = 0
 
         normalized_date = import_date(day_date)
 
@@ -59,10 +59,23 @@ def get_idph_data(today=date.today()):
 
         combined_data[normalized_date]['cases'] = day_cases
         combined_data[normalized_date]['deaths'] = day_deaths
+        # combined_data[normalized_date]['tested'] = day_tested
+
+    # get relevant info for tests
+    # for day in case_data.json():
+    for day in []:
+        day_tested = 0
+
+        normalized_date = import_date(day_date)
+
+        # add day if it doesn't exist
+        if normalized_date not in combined_data:
+            combined_data[normalized_date] = dict()
+
         combined_data[normalized_date]['tested'] = day_tested
 
     # get relevant info for hospitalizations, etc.
-    for day in hospital_data.json():
+    for day in hospital_data.json()['HospitalUtilizationResults']:
         day_date = day['ReportDate']
         day_covid_vent = day['VentilatorInUseCOVID']
         day_covid_icu = day['ICUInUseBedsCOVID']
@@ -80,10 +93,10 @@ def get_idph_data(today=date.today()):
         combined_data[normalized_date]['covid_beds'] = day_covid_beds
 
     # Check to make sure that the data for today is available, otherwise try again in 5 minutes.
-    if today_formatted not in combined_data:
-        print("Data not available yet, pausing 30 seconds.")
-        time.sleep(300)
-        combined_data = get_idph_data()
+    # if today_formatted not in combined_data:
+    #     print("Data not available yet, pausing 30 seconds.")
+    #     time.sleep(300)
+    #     combined_data = get_idph_data()
 
     # Ingest CDC data
     for day in cdc_vaccine_data.json():
@@ -131,6 +144,20 @@ def get_idph_data(today=date.today()):
         else:
             booster_percent_65plus = 0
         
+        bivalent_booster_5plus = 0
+        bivalent_booster_12plus = 0
+        bivalent_booster_18plus = 0
+        bivalent_booster_65plus = 0
+
+        if 'bivalent_booster_5plus_pop_pct' in day.keys():
+            bivalent_booster_5plus = day['bivalent_booster_5plus_pop_pct']
+        if 'bivalent_booster_12plus_pop_pct' in day.keys():
+            bivalent_booster_12plus = day['bivalent_booster_12plus_pop_pct']
+        if 'bivalent_booster_18plus_pop_pct' in day.keys():
+            bivalent_booster_18plus = day['bivalent_booster_18plus_pop_pct']
+        if 'bivalent_booster_65plus_pop_pct' in day.keys():
+            bivalent_booster_65plus = day['bivalent_booster_65plus_pop_pct']
+
 
         normalized_date = import_date(day_date, add_day=True, cdc=True)
 
@@ -154,23 +181,28 @@ def get_idph_data(today=date.today()):
         combined_data[normalized_date]['fully_vaccinated_percent_65plus'] = fully_vaccinated_65plus
         combined_data[normalized_date]['booster_percent_total'] = booster_percent_total
         combined_data[normalized_date]['booster_percent_18plus'] = booster_percent_18plus
-        combined_data[normalized_date]['booster_percent_65plus'] = booster_percent_65plus        
+        combined_data[normalized_date]['booster_percent_65plus'] = booster_percent_65plus       
+        combined_data[normalized_date]['bivalent_booster_5plus'] = bivalent_booster_5plus       
+        combined_data[normalized_date]['bivalent_booster_12plus'] = bivalent_booster_12plus       
+        combined_data[normalized_date]['bivalent_booster_18plus'] = bivalent_booster_18plus       
+        combined_data[normalized_date]['bivalent_booster_65plus'] = bivalent_booster_65plus       
+
         
     # Check to make sure each data source had data.  Saw conditions where we retrieve data as it's being updated and crash.
-    if "cases" not in combined_data[today_formatted]:
-        print("IDPH case/test data not available yet, pausing 30 seconds.")
-        time.sleep(300)
-        combined_data = get_idph_data()
+    # if "cases" not in combined_data[today_formatted]:
+    #     print("IDPH case/test data not available yet, pausing 30 seconds.")
+    #     time.sleep(300)
+    #     combined_data = get_idph_data()
         
-    if "covid_vent" not in combined_data[today_formatted]:
-        print("IDPH hospitalization data not available yet, pausing 30 seconds.")
-        time.sleep(300)
-        combined_data = get_idph_data()
+    # if "covid_vent" not in combined_data[today_formatted]:
+    #     print("IDPH hospitalization data not available yet, pausing 30 seconds.")
+    #     time.sleep(300)
+    #     combined_data = get_idph_data()
         
-    if "vaccines_administered_total" not in combined_data[today_formatted]:
-        print("CDC vaccine data not available yet, pausing 30 seconds.")
-        time.sleep(300)
-        combined_data = get_idph_data()
+    # if "vaccines_administered_total" not in combined_data[today_formatted]:
+    #     print("CDC vaccine data not available yet, pausing 30 seconds.")
+    #     time.sleep(300)
+    #     combined_data = get_idph_data()
 
     return combined_data
     
